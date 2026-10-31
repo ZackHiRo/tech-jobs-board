@@ -1,0 +1,92 @@
+{
+  "max_age_days": 14,
+  "keep_days": 30,
+  "max_new_per_run": 400,
+  "categories": [
+    {
+      "name": "Data Science",
+      "color": "purple",
+      "title": "\\b(data scien\\w*|applied scientist|research scientist|quantitative analyst|statistician|decision scien\\w*)\\b"
+    },
+    {
+      "name": "AI & ML Engineering",
+      "color": "pink",
+      "title": "\\b(ai|a\\.i\\.|ml|llm|llms|genai|gen ai|generative ai|machine learning|deep learning|nlp|computer vision|mlops|ai/ml|ml/ai|prompt engineer|rag|agentic|ai agents?|inference|model training|perception)\\b"
+    },
+    {
+      "name": "Data Engineering",
+      "color": "blue",
+      "title": "\\b(data engineer\\w*|etl|elt|analytics engineer|data platform|data infrastructure|data architect|big data|dbt|spark|databricks|snowflake|data pipeline\\w*|data warehouse)\\b"
+    },
+    {
+      "name": "Security",
+      "color": "red",
+      "title": "\\b(security|appsec|devsecops|cyber\\w*|penetration|pentest\\w*|soc analyst|detection engineer)\\b"
+    },
+    {
+      "name": "DevOps & Cloud",
+      "color": "orange",
+      "title": "\\b(devops|sre|site reliability|platform engineer\\w*|cloud engineer|cloud architect|infrastructure engineer|kubernetes|systems engineer|release engineer|build engineer)\\b"
+    },
+    {
+      "name": "Software Engineering",
+      "color": "gray",
+      "title": "\\b(software (engineer|developer|architect)\\w*|developer|programmer|swe|backend|back-end|back end|frontend|front-end|front end|full[- ]?stack|mobile (engineer|developer)|ios|android|react|python (engineer|developer)|golang|java (engineer|developer)|rust|node(\\.js)?|typescript|qa engineer|test automation|sdet|web developer|product engineer|application engineer|engineering manager)\\b"
+    },
+    {
+      "name": "Data Analytics & BI",
+      "color": "green",
+      "title": "\\b(data analyst|analytics (analyst|consultant|manager|lead)|business intelligence|bi developer|bi analyst|bi engineer|bi architect|power bi|tableau|looker|reporting analyst|insights analyst|product analyst|marketing analyst|business analyst)\\b"
+    }
+  ],
+  "title_exclude": "\\b(sales|account executive|account manager|recruit\\w*|talent|marketing|customer success|support specialist|technician|nurse|teacher|tutor|writer|copywriter|translator|lawyer|counsel|paralegal|accountant|bookkeeper|driver|warehouse|mechanical|electrical engineer|civil engineer|chemical engineer|hvac|field engineer|solutions? engineer|pre-?sales|sales engineer|data entry|annotator|labeling|rater|evaluator|trainers?|training data|data labell?ing|imagery analyst|course author|instructor|salesforce|business developer|business development|product manager|program manager|project manager|product owner|scrum master|sap consultant)\\b",
+  "himalayas_queries": [
+    "machine learning",
+    "ai engineer",
+    "llm",
+    "data scientist",
+    "data engineer",
+    "data analyst",
+    "analytics engineer",
+    "software engineer",
+    "backend engineer",
+    "frontend engineer",
+    "full stack",
+    "devops",
+    "site reliability",
+    "security engineer",
+    "mobile developer"
+  ],
+  "himalayas_pages": 2,
+  "jobicy_industries": [
+    "data-science",
+    "engineering",
+    "admin",
+    "cybersecurity",
+    "qa-testing"
+  ],
+  "greenhouse": [
+    "anthropic",
+    "databricks",
+    "gitlab",
+    "datadog",
+    "grafanalabs",
+    "fivetran",
+    "cloudflare"
+  ],
+  "ashby": [
+    "openai",
+    "cohere",
+    "perplexity",
+    "posthog",
+    "supabase",
+    "linear",
+    "langchain",
+    "pinecone",
+    "weaviate"
+  ],
+  "lever": [
+    "spotify"
+  ],
+  "hacker_news": true
+}
