@@ -45,7 +45,11 @@ Try it locally without Notion: `python3 board.py run --dry-run` writes `jobs.jso
 ## Use it from Claude (MCP server)
 
 `mcp_server.py` lets Claude, Cursor or any MCP client search the same jobs in plain language:
-*"Find junior data engineering jobs open to Africa & Middle East posted this week."*
+*"Find data engineering jobs I can apply to from Morocco, posted this week."*
+
+`open_to_country` keeps only jobs whose location names your country, says worldwide, or names a region that
+contains it (EMEA, Africa, MENA...), and says why each one matched. Jobs that only say "Remote" are left out and
+counted, so you can check them yourself.
 
 It runs the same fetch-and-classify pipeline on your own machine, directly from the sources, so it needs no
 Notion token or API key. Results are cached for 6 hours in `~/.cache/tech-jobs-board/`. The first search after
@@ -53,7 +57,7 @@ install takes about 45 seconds while the cache fills; after that, searches are i
 
 | Tool | What it does |
 |---|---|
-| `search_jobs` | Filter by keywords, category, seniority, region (`open_to`) and posting age. Newest first, with apply links. |
+| `search_jobs` | Filter by keywords, category, seniority, region (`open_to`), the country you live in (`open_to_country`) and posting age. Newest first, with apply links. |
 | `list_filters` | Valid categories, seniority levels and regions, with job counts |
 | `board_status` | When the data was fetched and how many jobs came from each source |
 | `refresh_jobs` | Fetch the latest jobs now (at most every 3 hours) |

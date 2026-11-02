@@ -25,6 +25,7 @@ except ImportError:
     pass
 
 import board
+import countries
 
 CACHE = Path.home() / ".cache" / "tech-jobs-board" / "jobs.json"
 TTL_HOURS = 6          # refresh in the background when the cache is older than this
@@ -112,9 +113,20 @@ def _pick(value, allowed, field):
     raise ValueError(f"Unknown {field} '{value}'. Use one of: {', '.join(allowed)}")
 
 
+def _notes(country, raw_country, unclear):
+    notes = []
+    if not _state["jobs"]:
+        notes.append("Still fetching jobs for the first time (about a minute). Try again shortly.")
+    if country and country not in countries.ALL:
+        notes.append(f"'{raw_country}' is not in the country list, so only exact mentions and worldwide jobs match.")
+    if country and unclear:
+        notes.append(f"{unclear} more jobs only say 'Remote' with no country; check those listings yourself.")
+    return " ".join(notes) or None
+
+
 @mcp.tool()
 def search_jobs(query: str = "", category: str = "", seniority: str = "", open_to: str = "",
-                posted_within_days: int = 14, limit: int = 15) -> dict:
+                open_to_country: str = "", posted_within_days: int = 14, limit: int = 15) -> dict:
     """Search fresh remote tech jobs (AI/ML, data, software, DevOps, security).
 
     Args:
@@ -122,6 +134,10 @@ def search_jobs(query: str = "", category: str = "", seniority: str = "", open_t
         category: one of the categories from list_filters (e.g. "AI & ML Engineering", "Data Engineering").
         seniority: Intern, Junior, Mid / Not stated, Senior, Lead / Staff+ or Manager.
         open_to: region the employer hires from: Worldwide, Africa & Middle East, Europe, Americas, Asia-Pacific.
+            Coarse: "Africa & Middle East" also includes roles limited to one country there.
+        open_to_country: a country the candidate lives in, e.g. "Morocco". Keeps only jobs whose location names
+            that country, says worldwide, or names a region that contains it (EMEA, Africa, MENA...). Prefer this
+            over open_to when the user says where they are.
         posted_within_days: only jobs posted in the last N days (max 14).
         limit: max results (1-50), newest first.
 
@@ -133,16 +149,24 @@ def search_jobs(query: str = "", category: str = "", seniority: str = "", open_t
     reg = _pick(open_to, REGIONS, "open_to")
     since = (datetime.now(timezone.utc) - timedelta(days=max(1, min(posted_within_days, 14)))).date().isoformat()
     terms = [t for t in re.split(r"\s+", query.lower().strip()) if t]
+    country = countries.canonical(open_to_country) if open_to_country.strip() else None
 
-    hits = []
+    hits, why, unclear = [], {}, 0
     for j in _state["jobs"]:
         if j["posted"] < since or (cat and j["category"] != cat) or (sen and j["seniority"] != sen):
             continue
         if reg and reg not in j["regions"]:
             continue
         hay = f"{j['title']} {j['company']} {j['location']}".lower()
-        if all(t in hay for t in terms):
-            hits.append(j)
+        if not all(t in hay for t in terms):
+            continue
+        if country:
+            reason = countries.match(j["location"], country)
+            if reason in (None, "unclear"):
+                unclear += reason == "unclear"
+                continue
+            why[j["url"]] = reason
+        hits.append(j)
     hits.sort(key=lambda j: j["posted"], reverse=True)
     limit = max(1, min(limit, 50))
     return {
@@ -151,9 +175,10 @@ def search_jobs(query: str = "", category: str = "", seniority: str = "", open_t
         "jobs": [{"title": j["title"], "company": j["company"], "category": j["category"],
                   "seniority": j["seniority"], "open_to": j["regions"], "location": j["location"],
                   "salary": j["salary"] or None, "posted": j["posted"], "apply_url": j["url"],
-                  "source": j["source"], "source_page": j["listing"]} for j in hits[:limit]],
+                  "source": j["source"], "source_page": j["listing"],
+                  **({"open_to_country": why[j["url"]]} if country else {})} for j in hits[:limit]],
         "data_as_of": _state["fetched_at"],
-        "note": None if _state["jobs"] else "Still fetching jobs for the first time (about a minute). Try again shortly.",
+        "note": _notes(country, open_to_country, unclear),
     }
 
 
