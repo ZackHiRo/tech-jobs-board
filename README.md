@@ -1,6 +1,6 @@
 # Remote Tech Jobs Board (Notion + GitHub Actions)
 
-A free, self-updating job board in Notion. Every morning a GitHub Action pulls fresh **remote** roles in
+A free, self-updating job board in Notion, plus an MCP server so you can search it from Claude. Every morning a GitHub Action pulls fresh **remote** roles in
 AI & ML, data science, data engineering, analytics, software, DevOps and security, tags each one with a
 **Category**, **Seniority** and the regions it is **Open to**, and adds the new ones to a Notion database
 that anyone can filter. Jobs older than 30 days are archived automatically.
@@ -41,6 +41,40 @@ If you add a source, read its terms first.
 
 Try it locally without Notion: `python3 board.py run --dry-run` writes `jobs.json` and `jobs.csv`.
 (On macOS with python.org Python, you may need `export SSL_CERT_FILE=$(python3 -m certifi)` first.)
+
+## Use it from Claude (MCP server)
+
+`mcp_server.py` lets Claude, Cursor or any MCP client search the same jobs in plain language:
+*"Find junior data engineering jobs open to Africa & Middle East posted this week."*
+
+It runs the same fetch-and-classify pipeline on your own machine, directly from the sources, so it needs no
+Notion token or API key. Results are cached for 6 hours in `~/.cache/tech-jobs-board/`. The first search after
+install takes about 45 seconds while the cache fills; after that, searches are instant.
+
+| Tool | What it does |
+|---|---|
+| `search_jobs` | Filter by keywords, category, seniority, region (`open_to`) and posting age. Newest first, with apply links. |
+| `list_filters` | Valid categories, seniority levels and regions, with job counts |
+| `board_status` | When the data was fetched and how many jobs came from each source |
+| `refresh_jobs` | Fetch the latest jobs now (at most every 3 hours) |
+
+**Install:** `pip install -r requirements-mcp.txt` (Python 3.10+).
+
+**Claude Desktop:** Settings → Developer → Edit Config, then add (use your own path):
+```json
+{
+  "mcpServers": {
+    "remote-tech-jobs": {
+      "command": "python3",
+      "args": ["/absolute/path/to/tech-jobs-board/mcp_server.py"]
+    }
+  }
+}
+```
+Restart Claude Desktop. **Claude Code:** `claude mcp add remote-tech-jobs -- python3 /absolute/path/to/tech-jobs-board/mcp_server.py`
+
+The same source terms apply: results carry the source and a link to the original listing, so keep them when you
+show results to others.
 
 ## Customise
 

@@ -21,6 +21,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -258,12 +259,14 @@ def classify(j):
 
 
 def collect():
+    # sources run in parallel; each one still sends its own requests one at a time
+    sources = [("himalayas", himalayas), ("jobicy", jobicy), ("remoteok", remoteok),
+               ("company boards", company_boards), ("hacker news", hacker_news if CFG["hacker_news"] else list)]
     raw = []
-    for name, fn in [("himalayas", himalayas), ("jobicy", jobicy), ("remoteok", remoteok),
-                     ("company boards", company_boards), ("hacker news", hacker_news if CFG["hacker_news"] else list)]:
-        got = fn()
-        print(f"{name}: {len(got)} fresh", file=sys.stderr)
-        raw += got
+    with ThreadPoolExecutor(len(sources)) as pool:
+        for name, got in zip([n for n, _ in sources], pool.map(lambda s: s[1](), sources)):
+            print(f"{name}: {len(got)} fresh", file=sys.stderr)
+            raw += got
     jobs, keys = [], set()
     for j in sorted(raw, key=lambda j: j["posted"], reverse=True):
         if not j["url"] or not classify(j):
